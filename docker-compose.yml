@@ -28,8 +28,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-    volumes:
-      - ../../rabbitmq_enabled_plugins:/etc/rabbitmq/enabled_plugins
+    # volumes:
+    #   - ../../rabbitmq_enabled_plugins:/etc/rabbitmq/enabled_plugins
     networks:
       - backend_services
   order-service:
@@ -106,25 +106,26 @@ services:
     depends_on:
       order-service:
         condition: service_healthy
-  # ai-service:
-  #   build: ../ai-service
-  #   container_name: 'ai-service'
-  #   restart: always
-  #   ports:
-  #     - 5001:5001
-  #   healthcheck:
-  #     test: ["CMD", "wget", "-O", "/dev/null", "-q", "http://ai-service:5001/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #   environment:
-  #     - USE_AZURE_OPENAI=True # set to False if you are not using Azure OpenAI
-  #     - AZURE_OPENAI_DEPLOYMENT_NAME= # required if using Azure OpenAI
-  #     - AZURE_OPENAI_ENDPOINT= # required if using Azure OpenAI
-  #     - OPENAI_API_KEY= # always required
-  #     - OPENAI_ORG_ID= # required if using OpenAI
-  #   networks:
-  #     - backend_services
+  ai-service:
+    # build: ../ai-service
+    image: ramymohamed/ai-service-l8:latest
+    container_name: 'ai-service'
+    restart: always
+    ports:
+      - 5001:5001
+    healthcheck:
+      test: ["CMD", "wget", "-O", "/dev/null", "-q", "http://ai-service:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - USE_AZURE_OPENAI=True # set to False if you are not using Azure OpenAI
+      - AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4 # required if using Azure OpenAI
+      - AZURE_OPENAI_ENDPOINT=https://babe0-m4lpkfmv-swedencentral.cognitiveservices.azure.com/ # required if using Azure OpenAI
+      - OPENAI_API_KEY=ALj9mevymh4S1TBae0rh6VidFN68NEAxmY7xj9oMwMHQVDEXCGNEJQQJ99ALACfhMk5XJ3w3AAAAACOGuSth # always required
+      - OPENAI_ORG_ID= # required if using OpenAI
+    networks:
+      - backend_services
 networks:
   backend_services:
     driver: bridge
